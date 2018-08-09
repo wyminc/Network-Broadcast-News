@@ -241,15 +241,15 @@ You can also type /stats to see your current stats`);
             } else if (socket.shield === true && client.weapon !== "rifle" && socket.shielded > 0) {
               if ((socket.shielded = socket.shielded - client.weaponDMG) > 0) {
 
-                socket.shielded = socket.shielded - client.weaponDMG
+                socket.shielded = (socket.shielded - client.weaponDMG);
                 socketShotWrite(socket);
 
               } else if ((socket.shielded = socket.shielded - client.weaponDMG) < 0) {
 
-                leftOverDamage = client.weaponDMG - socket.shield;
+                leftOverDamage = (client.weaponDMG - socket.shield);
                 socket.shielded = 0;
                 socket.shield = false;
-                socket.hp = socket.hp - leftOverDamage;
+                socket.hp = (socket.hp - leftOverDamage);
                 socketShotWrite(socket);
 
               } else if ((socket.shielded = socket.shielded - client.weaponDMG) === 0) {
@@ -260,26 +260,26 @@ You can also type /stats to see your current stats`);
               }
             } else if (socket.shield === true && client.weapon === "rifle" && socket.shielded > 0) {
 
-              socket.hp = socket.hp - client.weaponDMG;
+              socket.hp = (socket.hp - client.weaponDMG);
               socketShotWrite(socket);
 
             } else if (socket.weapon === "rifle" && client.shield === true) {
 
-              socket.hp = socket.hp - client.weaponDMG;
+              socket.hp = (socket.hp - client.weaponDMG);
               socketShotWrite(socket);
 
             } else if (socket.weapon === "rifle" && client.shield === false) {
 
               if ((socket.buffer = socket.buffer - client.weaponDMG) > 0) {
 
-                socket.buffer = socket.buffer - client.weaponDMG
+                socket.buffer = (socket.buffer - client.weaponDMG);
                 socketShotWrite(socket);
 
               } else if ((socket.buffer = socket.buffer - client.weaponDMG) < 0) {
 
-                leftOverDamage = client.weaponDMG - socket.buffer;
+                leftOverDamage = (client.weaponDMG - socket.buffer);
                 socket.buffer = 0;
-                socket.hp = socket.hp - leftOverDamage;
+                socket.hp = (socket.hp - leftOverDamage);
                 socketShotWrite(socket);
 
               } else if ((socket.buffer = socket.shielded - client.weaponDMG) === 0) {
@@ -295,7 +295,7 @@ You can also type /stats to see your current stats`);
 
             } else {
 
-              socket.hp = socket.hp - client.weaponDMG;
+              socket.hp = (socket.hp - client.weaponDMG);
               socketShotWrite(socket);
             }
           }
@@ -369,7 +369,7 @@ You can also type /stats to see your current stats`);
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp = 0;
-                  client.hp = client.hp - (client.grenadeDMG / 2);
+                  client.hp = (client.hp - (client.grenadeDMG / 2));
                   client.grenades = client.grenades - 1;
 
                   socketGrenadeWrite("YOU DED");
@@ -378,7 +378,7 @@ You can also type /stats to see your current stats`);
                 } else if ((client.hp = client.hp - client.grenadeDMG) < 1) {
                   socket.cover = false;
                   covers = covers - 1;
-                  socket.hp = socket.hp - client.grenadeDMG;
+                  socket.hp = (socket.hp - client.grenadeDMG);
                   client.hp = 0;
                   client.grenades = client.grenades - 1;
 
@@ -388,9 +388,9 @@ You can also type /stats to see your current stats`);
                 } else {
                   socket.cover = false;
                   covers = covers - 1;
-                  socket.hp = socket.hp - client.grenadeDMG;
-                  client.hp = client.hp - (client.grenadeDMG / 2);
-                  client.grenades = client.grenades - 1;
+                  socket.hp = (socket.hp - client.grenadeDMG);
+                  client.hp = (client.hp - (client.grenadeDMG / 2));
+                  client.grenades = (client.grenades - 1);
 
                   socketGrenadeWrite(socket);
 
@@ -401,32 +401,31 @@ You can also type /stats to see your current stats`);
                 if (((socket.hp = socket.hp - client.grenadeDMG) < 1) && ((client.hp = client.hp - client.grenadeDMG) < 1)) {
                   socket.hp = 0;
                   client.hp = 0;
-                  client.grenades = client.grenades - 1;
+                  client.grenades = (client.grenades - 1);
 
                   socket.write("YOU DED");
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else if ((socket.hp = socket.hp - client.grenadeDMG) < 1) {
                   socket.hp = 0;
-                  client.hp = client.hp - client.grenadeDMG;
-                  client.grenades = client.grenades - 1;
+                  client.hp = (client.hp - client.grenadeDMG);
+                  client.grenades = (client.grenades - 1);
 
                   socket.Write("YOU DED");
 
                   clientSomeGrenadeWrite(client);
                 } else if ((client.hp = client.hp - client.grenadeDMG) < 1) {
-                  socket.hp = socket.hp - client.grenadeDMG;
+                  socket.hp = (socket.hp - client.grenadeDMG);
                   client.hp = 0;
-                  client.grenades = client.grenades - 1;
+                  client.grenades = (client.grenades - 1);
 
                   socketGrenadeWrite(socket);
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else {
-                  client.write(client.grenadeDMG);
-                  socket.hp = socket.hp - client.grenadeDMG;
-                  client.hp = client.hp - client.grenadeDMG;
-                  client.grenades = client.grenades - 1
+                  socket.hp = (socket.hp - client.grenadeDMG);
+                  client.hp = (client.hp - client.grenadeDMG);
+                  client.grenades = (client.grenades - 1)
 
                   socketGrenadeWrite(socket);
 
