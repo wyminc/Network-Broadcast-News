@@ -12,7 +12,7 @@ const halo1pistol = 100;
 let weapon = "no weapon";
 let shield = false;
 let cover = false;
-let covers = 6;
+let covers = 50;
 let grenades = 3;
 let leftOverDamage = 0;
 let shielded = 100;
@@ -103,6 +103,13 @@ const server = net.createServer(client => {
   HP Buffer:` + client.buffer);
   }
 
+  client.hp = maxHP;
+  client.weapon = weapon;
+  client.shield = shield;
+  client.cover = cover;
+  client.grenades = grenades;
+  client.turn = turn;
+
   client.write(`
 Welcome to the sharpshooter arena.
 Please set up your username.
@@ -111,12 +118,6 @@ Please type /help if you need any help on commands.`);
 
 
   client.on("data", data => {
-    client.hp = maxHP;
-    client.weapon = weapon;
-    client.shield = shield;
-    client.cover = cover;
-    client.grenades = grenades;
-    client.turn = turn;
 
     const chat = data.toString();
 
@@ -172,7 +173,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
 
     } else if (chat.includes("/sniper")) {
       client.write("You are now equipped with a sniper rifle, use /headshot instead of /shoot to one shot people");
-      client.weapon = "halo1_pistol";
+      client.weapon = "sniper";
       client.weaponDMG = 500;
       client.pierce = true;
       client.shield = true;
@@ -225,6 +226,7 @@ You can also type /stats to see your current stats`);
                 clearInterval(timer);
               }, time
             )
+            client.cover = false;
             if (socket.cover === true) {
               socket.cover = false;
               covers = covers - 1;
@@ -299,9 +301,9 @@ You can also type /stats to see your current stats`);
       const splitAttackChat = (chat.split(" "))[1]
       const attackedName = splitAttackChat;
 
-      if (client.turn === true) {
+      if (client.turn === true && client.weapon === "sniper") {
         clientArr.forEach(socket => {
-
+          client.cover = false;
           turn = false;
           var timer = setInterval(
             function () {
@@ -311,15 +313,23 @@ You can also type /stats to see your current stats`);
           )
 
           if (socket.name === attackedName) {
-            socket.hp = 0;
-            client.write(socket.name + " has died");
-            socket.write("YOU DED");
+            if (socket.cover === true) {
+              socket.cover = false;
+              covers = covers - 1;
+              client.write(socket.name + " was under cover");
+            } else {
+              socket.hp = 0;
+              client.write(socket.name + " has died");
+              socket.write("YOU DED");
+            }
           }
         });
       } else {
-
-        client.write("CAN'T BE SPAMMING");
-
+        if (client.weapon !== "sniper") {
+          client.write("YOU CANT BE HEADSHOTTING");
+        } else {
+          client.write("CAN'T BE SPAMMING");
+        }
       }
     } else if (chat.includes("/grenade")) {
       const splitAttackChat = (chat.split(" "))[1];
@@ -329,7 +339,6 @@ You can also type /stats to see your current stats`);
         clientArr.forEach(socket => {
           if (client.grenades > 0) {
             if (socket.name === attackedName) {
-
               turn = false;
               var timer = setInterval(
                 function () {
@@ -337,7 +346,6 @@ You can also type /stats to see your current stats`);
                   clearInterval(timer);
                 }, time
               )
-
               if (socket.cover === true && covers > 0) {
                 socket.cover = false;
                 covers = covers - 1;
