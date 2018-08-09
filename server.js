@@ -3,11 +3,11 @@ const net = require("net");
 clientArr = [];
 
 const maxHP = 100;
-// const pistolDMG = 2;
-// const rifleDMG = 3;
-// const dualPistolDMG = 4;
-let grenadeDMG = 20;
-let halo1pistol = 100;
+const pistolDMG = 2;
+const rifleDMG = 3;
+const dualPistolDMG = 4;
+const grenadeDMG = 20;
+const halo1pistol = 100;
 
 let weapon = "no weapon";
 let shield = false;
@@ -136,7 +136,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
     } else if (chat.includes("/rifle")) {
       client.write("You are now equipped with a rifle, you aint dual equipped");
       client.weapon = "rifle";
-      client.weaponDMG = 3;
+      client.weaponDMG = rifleDMG;
       client.pierce = true;
       client.buffer = 100;
       client.shield = false;
@@ -145,7 +145,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
 
     } else if (chat.includes("/pistolshield")) {
       client.write("You are now equipped with a pistol and shield");
-      client.weaponDMG = 2;
+      client.weaponDMG = pistolDMG;
       client.pierce = false;
       client.shield = true;
       client.shielded = shielded;
@@ -155,7 +155,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
     } else if (chat.includes("/pistolpistol")) {
       client.write("You are now dual wielding pistols, what a badass")
       client.weapon = "dualPistols";
-      client.weaponDMG = 4;
+      client.weaponDMG = dualPistolDMG;
       client.pierce = false;
       client.shield = false;
       client.shielded = 0;
@@ -165,7 +165,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
     } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
       client.write("You are now equipped with a halo 1 pistol");
       client.weapon = "halo1_pistol";
-      client.weaponDMG = 100;
+      client.weaponDMG = halo1pistol;
       client.pierce = false;
       client.shielded = 0;
       client.buffer = 0;
@@ -287,6 +287,7 @@ You can also type /stats to see your current stats`);
               socket.hp = 0;
 
             } else {
+
               socket.hp = socket.hp - client.weaponDMG;
               socketShotWrite(socket);
             }
@@ -347,35 +348,90 @@ You can also type /stats to see your current stats`);
                 }, time
               )
               if (socket.cover === true && covers > 0) {
-                socket.cover = false;
-                covers = covers - 1;
-                socket.hp = socket.hp - 20;
-                client.hp = client.hp - (20 / 2);
-                client.grenades = client.grenades - 1;
+                if ((socket.hp = socket.hp - grenadeDMG) < 0 && (client.hp = client.hp - grenadeDMG) < 0) {
+                  socket.cover = false;
+                  covers = covers - 1;
+                  socket.hp = 0;
+                  client.hp = 0;
+                  client.grenades = client.grenades - 1;
 
-                socketGrenadeWrite(socket);
+                  socket.write("YOU DED");
 
-                clientSomeGrenadeWrite(client);
+                  client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
+                } else if ((socket.hp = socket.hp - grenadeDMG) < 0) {
+                  socket.cover = false;
+                  covers = covers - 1;
+                  socket.hp = 0;
+                  client.hp = client.hp - (grenadeDMG / 2);
+                  client.grenades = client.grenades - 1;
+
+                  socketGrenadeWrite("YOU DED");
+
+                  clientSomeGrenadeWrite(client);
+                } else if ((client.hp = client.hp - grenadeDMG) < 0) {
+                  socket.cover = false;
+                  covers = covers - 1;
+                  socket.hp = socket.hp - grenadeDMG;
+                  client.hp = 0;
+                  client.grenades = client.grenades - 1;
+
+                  socketGrenadeWrite(socket);
+
+                  cient.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
+                } else {
+                  socket.cover = false;
+                  covers = covers - 1;
+                  socket.hp = socket.hp - grenadeDMG;
+                  client.hp = client.hp - (grenadeDMG / 2);
+                  client.grenades = client.grenades - 1;
+
+                  socketGrenadeWrite(socket);
+
+                  clientSomeGrenadeWrite(client);
+                }
 
               } else {
-                socket.hp = socket.hp - 20;
-                client.hp = client.hp - 20;
-                client.grenades = client.grenades - 1
+                if ((socket.hp = socket.hp - grenadeDMG) < 0 && (client.hp = client.hp - grenadeDMG) < 0) {
+                  socket.hp = 0;
+                  client.hp = 0;
+                  client.grenades = client.grenades - 1;
 
-                socketGrenadeWrite(socket);
+                  socket.write("YOU DED");
 
-                clientFullGrenadeWrite(client);
+                  client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
+                } else if ((socket.hp = socket.hp - grenadeDMG) < 0) {
+                  socket.hp = 0;
+                  client.hp = client.hp - grenadeDMG;
+                  client.grenades = client.grenades - 1;
+
+                  socket.Write("YOU DED");
+
+                  clientSomeGrenadeWrite(client);
+                } else if ((client.hp = client.hp - grenadeDMG) < 0) {
+                  socket.hp = socket.hp - grenadeDMG;
+                  client.hp = 0;
+                  client.grenades = client.grenades - 1;
+
+                  socketGrenadeWrite(socket);
+
+                  cient.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
+                } else {
+                  socket.hp = socket.hp - grenadeDMG;
+                  client.hp = client.hp - grenadeDMG;
+                  client.grenades = client.grenades - 1
+
+                  socketGrenadeWrite(socket);
+
+                  clientFullGrenadeWrite(client);
+                }
               }
             }
           } else {
             client.write("YOU OUT OF GRENADES");
-          }
-
-        });
+          };
+        })
       } else {
-
         client.write("CAN'T BE SPAMMING");
-
       }
     } else {
       clientArr.forEach(socket => {
