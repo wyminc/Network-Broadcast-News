@@ -20,95 +20,96 @@ let playersArr = [];
 let turn = true;
 let time = 2000;
 
-let clientStatsWrite = () => {
-  if (!client.name) {
-    client.write("NONAME");
-    client.write(`
-HP:` + client.hp);
-    client.write(`
-WeaponDmg:` + client.weaponDMG);
-    client.write(`
-Shields:` + client.shielded);
-    client.write(`
-Grenades:` + client.grenades);
-  } else {
-    client.write(`
-Name: ` + JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)));
-    client.write(`
-HP:` + client.hp);
-    client.write(`
-WeaponDmg:` + client.weaponDMG);
-    client.write(`
-Shields:` + client.shielded);
-    client.write(`
-Grenades:` + client.grenades);
-  }
-}
 
-let socketShotWrite = () => {
-  socket.write(`
-You was shot at foo`);
-  socket.write(`
-`)
-  socket.write(`
-HP:` + socket.hp);
-  socket.write(`
-Shields:` + socket.shielded);
-  socket.write(`
-HP Buffer:` + socket.buffer);
-};
-
-let socketGrenadeWrite = () => {
-  socket.write(`
-You was grenaded at foo`);
-  socket.write(`
-`)
-  socket.write(`
-HP:` + socket.hp);
-  client.write(`
-Grenades:` + client.grenades);
-  socket.write(`
-Shields:` + socket.shielded);
-  socket.write(`
-HP Buffer:` + socket.buffer);
-};
-
-let clientSomeGrenadeWrite = () => {
-  client.write(`
-You received the full backlash from the grenade`);
-  socket.write(`
-`)
-  client.write(`
-HP:` + client.hp);
-  client.write(`
-Grenades:` + client.grenades);
-  client.write(`
-Shields:` + client.shielded);
-  client.write(`
-HP Buffer:` + client.buffer);
-}
-
-let clientFullGrenadeWrite = () => {
-  client.write(`
-You received the full backlash from the grenade`);
-  socket.write(`
-`)
-  client.write(`
-HP:` + client.hp);
-  client.write(`
-Grenades:` + client.grenades);
-  client.write(`
-Shields:` + client.shielded);
-  client.write(`
-HP Buffer:` + client.buffer);
-}
 
 
 
 const server = net.createServer(client => {
   console.log("CLIENT CONNECTED!");
 
-  // var obj = client;
+  let clientStatsWrite = () => {
+    if (!client.name) {
+      client.write(`
+  NONAME`);
+      client.write(`
+  HP:` + client.hp);
+      client.write(`
+  WeaponDmg:` + client.weaponDMG);
+      client.write(`
+  Shields:` + client.shielded);
+      client.write(`
+  Grenades:` + client.grenades);
+    } else {
+      client.write(`
+  Name: ` + JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)));
+      client.write(`
+  HP:` + client.hp);
+      client.write(`
+  WeaponDmg:` + client.weaponDMG);
+      client.write(`
+  Shields:` + client.shielded);
+      client.write(`
+  Grenades:` + client.grenades);
+    }
+  }
+
+  let socketShotWrite = () => {
+    socket.write(`
+  You was shot at foo`);
+    socket.write(`
+  `)
+    socket.write(`
+  HP:` + socket.hp);
+    socket.write(`
+  Shields:` + socket.shielded);
+    socket.write(`
+  HP Buffer:` + socket.buffer);
+  };
+
+  let socketGrenadeWrite = () => {
+    socket.write(`
+  You was grenaded at foo`);
+    socket.write(`
+  `)
+    socket.write(`
+  HP:` + socket.hp);
+    client.write(`
+  Grenades:` + client.grenades);
+    socket.write(`
+  Shields:` + socket.shielded);
+    socket.write(`
+  HP Buffer:` + socket.buffer);
+  };
+
+  let clientSomeGrenadeWrite = () => {
+    client.write(`
+  You received the full backlash from the grenade`);
+    socket.write(`
+  `)
+    client.write(`
+  HP:` + client.hp);
+    client.write(`
+  Grenades:` + client.grenades);
+    client.write(`
+  Shields:` + client.shielded);
+    client.write(`
+  HP Buffer:` + client.buffer);
+  }
+
+  let clientFullGrenadeWrite = () => {
+    client.write(`
+  You received the full backlash from the grenade`);
+    socket.write(`
+  `)
+    client.write(`
+  HP:` + client.hp);
+    client.write(`
+  Grenades:` + client.grenades);
+    client.write(`
+  Shields:` + client.shielded);
+    client.write(`
+  HP Buffer:` + client.buffer);
+  }
 
   client.write(`
 Welcome to the sharpshooter arena.
