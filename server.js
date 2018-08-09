@@ -244,6 +244,7 @@ You can also type /stats to see your current stats`);
                 client.write("IM HERE1");
                 socket.write("IM HERE1");
                 socket.shielded -= client.weaponDMG;
+                socket.write(client.weaponDMG);
                 socketShotWrite(socket);
 
               } else if ((socket.shielded = socket.shielded - client.weaponDMG) < 1) {
