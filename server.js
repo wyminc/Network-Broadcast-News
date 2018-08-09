@@ -421,6 +421,7 @@ You can also type /stats to see your current stats`);
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else {
+                  client.write(client.grenadeDMG);
                   socket.hp = socket.hp - client.grenadeDMG;
                   client.hp = client.hp - client.grenadeDMG;
                   client.grenades = client.grenades - 1
