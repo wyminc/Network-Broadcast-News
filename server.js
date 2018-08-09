@@ -411,7 +411,11 @@ HP Buffer:` + socket.buffer);
     } else {
       clientArr.forEach(socket => {
         if (client !== socket) {
-          socket.write(JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)) + ": " + chat);
+          if (!client.name) {
+            socket.write("NONAME: " + chat);
+          } else {
+            socket.write(JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)) + ": " + chat);
+          }
         }
       })
     }
