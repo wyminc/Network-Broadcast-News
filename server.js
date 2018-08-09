@@ -11,14 +11,12 @@ const halo1pistol = 100;
 const shielded = 100;
 const time = 2000;
 
-let weapon = "no weapon";
-let shield = false;
 let cover = false;
 let covers = 50;
 let grenades = 3;
 let leftOverDamage = 0;
-let playersArr = [];
-let turn = true;
+let namesArr = [];
+
 
 
 
@@ -50,11 +48,13 @@ const server = net.createServer(client => {
       client.write(`
   Shields:` + client.shielded);
       client.write(`
+  HP Buffer:` + client.buffer);
+      client.write(`
   Grenades:` + client.grenades);
     }
   }
 
-  let socketShotWrite = (socket) => {
+  let socketShotWrite = (socket, client) => {
     socket.write(`
   You was shot at foo`);
     socket.write(`
@@ -63,7 +63,10 @@ const server = net.createServer(client => {
   Shields:` + socket.shielded);
     socket.write(`
   HP Buffer:` + socket.buffer);
+
+    client.write("You shot " + JSON.stringify(client.name).slice(1, (JSON.stringify(socket.name).length - 3)) + " for " + client.weaponDMG + " damage");
   };
+
 
   let socketGrenadeWrite = (socket) => {
     socket.write(`
@@ -105,9 +108,8 @@ const server = net.createServer(client => {
   }
 
   client.hp = maxHP;
-  client.weapon = weapon;
+  client.weapon = "noWeapon";
   client.shield = false;
-  client.shielded = 0;
   client.cover = cover;
   client.grenades = grenades;
   client.turn = true;
@@ -115,7 +117,7 @@ const server = net.createServer(client => {
   client.write(`
 Welcome to the sharpshooter arena.
 Please set up your username.
-To set up a username, type /name, space, and then the username you want.
+To set up a username, type /name and the username you want.
 Please type /help if you need any help on commands.`);
 
 
@@ -124,17 +126,46 @@ Please type /help if you need any help on commands.`);
     const chat = data.toString();
 
     if (chat.includes("/name")) {
-      client.name = (chat.split(" "))[1];
-      client.write(`
+      if (namesArr.length === 0) {
+        client.name = ((chat.split(" "))[1]);
+        namesArr.push(client.name);
+        client.write(`
 Now choose a weapon, you only have 2 hands :)
 You will type "/" then the choice of gun you want
 WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
   Pistol: 2 damage, attribute: no pierce, able to be paired with another pistol or shield
   Rifle: 3 damage, attribute: pierce, buff: extra 100hp, two hands
   Shield: no damage, attribute: buff-canceler, buff: 100 shield
-  Everyone comes equipped with a 3 grenades. They bypass cover but you take half the damage of the impact.
-  Grenade: 10 damage, attribute: bypass cover.
-      `)
+Everyone comes equipped with a 3 grenades. They bypass cover but you take half the damage of the impact.
+  Grenade: 10 damage, attribute: bypass cover.`)
+      } else {
+        let duplicateNameCheck = (namesArr.map(socket => {
+          if (((chat.split(" "))[1]) === socket) {
+            return socket = true;
+          } else {
+            return socket = false;
+          }
+        })).filter(socket => socket === true);
+
+        if (duplicateNameCheck.length > 0) {
+          client.write(`
+That name has been taken already`);
+          client.write(`
+Please try another name by typing /name and your desired name again`)
+        } else {
+          client.name = ((chat.split(" "))[1]);
+          namesArr.push(client.name);
+          client.write(`
+Now choose a weapon, you only have 2 hands :)
+You will type "/" then the choice of gun you want
+WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
+  Pistol: 2 damage, attribute: no pierce, able to be paired with another pistol or shield
+  Rifle: 3 damage, attribute: pierce, buff: extra 100hp, two hands
+  Shield: no damage, attribute: buff-canceler, buff: 100 shield
+Everyone comes equipped with a 3 grenades. They bypass cover but you take half the damage of the impact.
+  Grenade: 10 damage, attribute: bypass cover.`)
+        }
+      }
     } else if (chat.includes("/rifle")) {
       client.write("You are now equipped with a rifle, you aint dual equipped");
       client.weapon = "rifle";
@@ -144,8 +175,6 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shield = false;
       client.shielded = 0;
       client.grenadeDMG = grenadeDMG;
-      playersArr.push(client.name);
-
     } else if (chat.includes("/pistolshield")) {
       client.write("You are now equipped with a pistol and shield");
       client.weaponDMG = pistolDMG;
@@ -154,8 +183,6 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shielded = shielded;
       client.buffer = 0;
       client.grenadeDMG = grenadeDMG;
-      playersArr.push(client.name);
-
     } else if (chat.includes("/pistolpistol")) {
       client.write("You are now dual wielding pistols, what a badass")
       client.weapon = "dualPistols";
@@ -165,8 +192,6 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shielded = 0;
       client.buffer = 0;
       client.grenadeDMG = grenadeDMG;
-      playersArr.push(client.name);
-
     } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
       client.write("You are now equipped with a halo 1 pistol");
       client.weapon = "halo1_pistol";
@@ -175,8 +200,6 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shielded = 0;
       client.buffer = 0;
       client.grenadeDMG = grenadeDMG;
-      playersArr.push(client.name);
-
     } else if (chat.includes("/sniper")) {
       client.write("You are now equipped with a sniper rifle, use /headshot instead of /shoot to one shot people");
       client.weapon = "sniper";
@@ -186,8 +209,6 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shielded = 0;
       client.buffer = 0;
       client.grenadeDMG = grenadeDMG;
-      playersArr.push(client.name);
-
     } else if (chat.includes("/help")) {
       client.write(`
 You can type /shoot and the name of the username (space inbetween) you want to shoot to shoot with your weapon.
@@ -204,11 +225,14 @@ You can also type /stats to see your current stats`);
       clientStatsWrite(client);
 
     } else if (chat.includes("/current")) {
+      let stringifyArr = (JSON.stringify(namesArr));
+      let stringedNameArray = JSON.parse(stringifyArr).map(name => {
+        return name.replace(/"/g, "").replace(/\n/g, "");
+      })
       client.write(`
-  Players currently online:` +
+  Players currently online: ` +
         `
-      ` +
-        playersArr);
+  ` + (stringedNameArray.sort()).join(", "));
 
     } else if (chat.includes("/cover")) {
       if (covers > 0) {
@@ -225,104 +249,69 @@ You can also type /stats to see your current stats`);
 
       if (client.turn === true) {
         clientArr.forEach(socket => {
-          if (socket.name === attackedName) {
-            turn = false;
-            var timer = setInterval(
-              function () {
+          if (socket.weapon === "noWeapon") {
+            client.write("Let the player choose a weapon first before you shoot");
+          } else {
+            if (socket.name === attackedName) {
+              turn = false;
+              var timer = setInterval(function () {
                 turn = true;
                 clearInterval(timer);
-              }, time
-            )
-            client.cover = false;
-            if (socket.cover === true) {
-              socket.cover = false;
-              covers = covers - 1;
-              client.write(socket.name + " was under cover");
-            } else if (socket.shield === true && client.weapon !== "rifle" && socket.shielded > 0) {
-              if ((socket.shielded = socket.shielded - client.weaponDMG) > 0) {
+              }, time)
+              client.cover = false;
+              if (socket.cover === true) {
+                socket.cover = false;
+                covers = covers - 1;
+                client.write(socket.name + " was under cover");
+              } else if (socket.shield === true && client.weapon !== "rifle") {
 
-                client.write("IM HERE1");
-                socket.write("IM HERE1");
-                socket.shielded -= client.weaponDMG;
-                socket.write(client.weaponDMG);
-                socketShotWrite(socket);
+                if ((socket.shielded - client.weaponDMG) > socket.shielded) {
+                  leftOverDamage = (client.weaponDMG - socket.shield);
+                  socket.shielded = 0;
+                  socket.shield = false;
+                  socket.hp = (socket.hp - leftOverDamage);
+                  socketShotWrite(socket, client);
+                } else if ((socket.shielded - client.weaponDMG) === socket.shielded) {
+                  socket.shielded = 0;
+                  socket.shield = false;
+                  socketShotWrite(socket, client);
+                } else {
+                  socket.shielded -= client.weaponDMG;
+                  socketShotWrite(socket, client);
+                }
+              } else if (socket.shield === true && client.weapon === "rifle" && socket.shielded > 0) {
+                socket.hp = (socket.hp - client.weaponDMG);
+                socketShotWrite(socket, client);
+              } else if (socket.weapon === "rifle" && client.shield === true) {
+                socket.hp = (socket.hp - client.weaponDMG);
+                socketShotWrite(socket, client);
+              } else if (socket.weapon === "rifle" && client.shield === false) {
+                if ((socket.buffer - client.weaponDMG) > socket.buffer) {
+                  leftOverDamage = (client.weaponDMG - socket.buffer);
+                  socket.buffer = 0;
+                  socket.hp = (socket.hp - leftOverDamage);
+                  socketShotWrite(socket, client);
 
-              } else if ((socket.shielded = socket.shielded - client.weaponDMG) < 1) {
-
-                client.write("IM HERE2");
-                socket.write("IM HERE2");
-                leftOverDamage = (client.weaponDMG - socket.shield);
-                socket.shielded = 0;
-                socket.shield = false;
-                socket.hp = (socket.hp - leftOverDamage);
-                socketShotWrite(socket);
-
-              } else if ((socket.shielded = socket.shielded - client.weaponDMG) === 0) {
-
-                client.write("IM HERE3");
-                socket.write("IM HERE3");
-                socket.shielded = 0;
-                socket.shield = false;
-                socketShotWrite(socket);
+                } else if ((socket.buffer - client.weaponDMG) === socket.buffer) {
+                  socket.buffer = 0;
+                  socketShotWrite(socket, client);
+                } else {
+                  socket.buffer -= client.weaponDMG;
+                  socketShotWrite(socket, client);
+                }
+              } else if ((socket.hp - client.weaponDMG) > socket.hp) {
+                client.write(socket.name + " has died");
+                socket.write("YOU DED");
+                socket.hp = 0;
+              } else {
+                socket.hp -= client.weaponDMG;
+                socketShotWrite(socket, client);
               }
-            } else if (socket.shield === true && client.weapon === "rifle" && socket.shielded > 0) {
-
-              socket.hp = (socket.hp - client.weaponDMG);
-              socketShotWrite(socket);
-
-            } else if (socket.weapon === "rifle" && client.shield === true) {
-
-              client.write("IM HERE4");
-              socket.write("IM HERE4");
-              socket.hp = (socket.hp - client.weaponDMG);
-              socketShotWrite(socket);
-
-            } else if (socket.weapon === "rifle" && client.shield === false) {
-
-              if ((socket.buffer = socket.buffer - client.weaponDMG) > 0) {
-
-                client.write("IM HERE5");
-                socket.write("IM HERE5");
-                socket.buffer = (socket.buffer - client.weaponDMG);
-                socketShotWrite(socket);
-
-              } else if ((socket.buffer = socket.buffer - client.weaponDMG) < 1) {
-
-                client.write("IM HERE6");
-                socket.write("IM HERE6");
-                leftOverDamage = (client.weaponDMG - socket.buffer);
-                socket.buffer = 0;
-                socket.hp = (socket.hp - leftOverDamage);
-                socketShotWrite(socket);
-
-              } else if ((socket.buffer = socket.shielded - client.weaponDMG) === 0) {
-
-                client.write("IM HERE7");
-                socket.write("IM HERE7");
-                socket.buffer = 0;
-                socketShotWrite(socket);
-              }
-            } else if ((socket.hp = socket.hp - client.weaponDMG) < 1) {
-
-              client.write("IM HERE8");
-              socket.write("IM HERE8");
-              client.write(socket.name + " has died");
-              socket.write("YOU DED");
-              socket.hp = 0;
-
-            } else {
-
-              client.write("IM HERE9");
-              socket.write("IM HERE9");
-              socket.hp = (socket.hp - client.weaponDMG);
-              socketShotWrite(socket);
             }
           }
         })
       } else {
-
         client.write("CAN'T BE SPAMMING");
-
       }
     } else if (chat.includes("/headshot")) {
       const splitAttackChat = (chat.split(" "))[1]
@@ -366,6 +355,7 @@ You can also type /stats to see your current stats`);
         clientArr.forEach(socket => {
           if (client.grenades > 0) {
             if (socket.name === attackedName) {
+              client.cover = false;
               turn = false;
               var timer = setInterval(
                 function () {
@@ -374,52 +364,37 @@ You can also type /stats to see your current stats`);
                 }, time
               )
               if (socket.cover === true && covers > 0) {
-                if (((socket.hp = socket.hp - client.grenadeDMG) < 1) && ((client.hp = client.hp - client.grenadeDMG) < 1)) {
-
-                  client.write("IM HERE10");
-                  socket.write("IM HERE10");
-
+                if (((socket.hp - client.grenadeDMG) > socket.hp) && ((client.hp - client.grenadeDMG) > socket.hp)) {
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp = 0;
                   client.hp = 0;
-                  client.grenades = client.grenades - 1;
+                  client.grenades = (client.grenades - 1);
 
                   socket.write("YOU DED");
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
-                } else if ((socket.hp = socket.hp - client.grenadeDMG) < 1) {
-                  client.write("IM HERE11");
-                  socket.write("IM HERE11");
-
+                } else if ((socket.hp - client.grenadeDMG) > socket.hp) {
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp = 0;
                   client.hp -= (client.grenadeDMG / 2);
-                  client.grenades = client.grenades - 1;
+                  client.grenades = (client.grenades - 1);
 
                   socketGrenadeWrite("YOU DED");
 
                   clientSomeGrenadeWrite(client);
-                } else if ((client.hp -= client.grenadeDMG) < 1) {
-
-                  client.write("IM HERE12");
-                  socket.write("IM HERE12");
-
+                } else if ((client.hp - client.grenadeDMG) > client.hp) {
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp -= client.grenadeDMG;
                   client.hp = 0;
-                  client.grenades = client.grenades - 1;
+                  client.grenades = (client.grenades - 1);
 
                   socketGrenadeWrite(socket);
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else {
-
-                  client.write("IM HERE13");
-                  socket.write("IM HERE13");
-
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp -= client.grenadeDMG;
@@ -432,11 +407,7 @@ You can also type /stats to see your current stats`);
                 }
 
               } else {
-                if (((socket.hp -= client.grenadeDMG) < 1) && ((client.hp -= client.grenadeDMG) < 1)) {
-
-                  client.write("IM HERE14");
-                  socket.write("IM HERE14");
-
+                if (((socket.hp - client.grenadeDMG) > socket.hp) && ((client.hp - client.grenadeDMG) > client.hp)) {
                   socket.hp = 0;
                   client.hp = 0;
                   client.grenades = (client.grenades - 1);
@@ -444,11 +415,7 @@ You can also type /stats to see your current stats`);
                   socket.write("YOU DED");
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
-                } else if ((socket.hp -= client.grenadeDMG) < 1) {
-
-                  client.write("IM HERE15");
-                  socket.write("IM HERE15");
-
+                } else if ((socket.hp - client.grenadeDMG) > socket.hp) {
                   socket.hp = 0;
                   client.hp -= client.grenadeDMG;
                   client.grenades = (client.grenades - 1);
@@ -456,11 +423,7 @@ You can also type /stats to see your current stats`);
                   socket.Write("YOU DED");
 
                   clientSomeGrenadeWrite(client);
-                } else if ((client.hp -= client.grenadeDMG) < 1) {
-
-                  client.write("IM HERE16");
-                  socket.write("IM HERE16");
-
+                } else if ((client.hp - client.grenadeDMG) > client.hp) {
                   socket.hp -= client.grenadeDMG;
                   client.hp = 0;
                   client.grenades = (client.grenades - 1);
@@ -469,10 +432,6 @@ You can also type /stats to see your current stats`);
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else {
-
-                  client.write("IM HERE17");
-                  socket.write("IM HERE17");
-
                   socket.hp -= client.grenadeDMG;
                   client.hp -= client.grenadeDMG;
                   client.grenades = (client.grenades - 1)
@@ -493,10 +452,14 @@ You can also type /stats to see your current stats`);
     } else {
       clientArr.forEach(socket => {
         if (client !== socket) {
-          if (!client.name) {
-            socket.write("NONAME: " + chat);
+          if (chat.includes("/")) {
+            console.log(chat);
           } else {
-            socket.write(JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)) + ": " + chat);
+            if (!client.name) {
+              socket.write("NONAME: " + chat);
+            } else {
+              socket.write(JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)) + ": " + chat);
+            }
           }
         }
       })
