@@ -3,11 +3,11 @@ const net = require("net");
 clientArr = [];
 
 const maxHP = 100;
-const pistolDMG = 2;
-const rifleDMG = 3;
-const dualPistolDMG = 4;
-const grenadeDMG = 20;
-const halo1pistol = 100;
+// const pistolDMG = 2;
+// const rifleDMG = 3;
+// const dualPistolDMG = 4;
+let grenadeDMG = 20;
+let halo1pistol = 100;
 
 let weapon = "no weapon";
 let shield = false;
@@ -136,7 +136,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
     } else if (chat.includes("/rifle")) {
       client.write("You are now equipped with a rifle, you aint dual equipped");
       client.weapon = "rifle";
-      client.weaponDMG = rifleDMG;
+      client.weaponDMG = 3;
       client.pierce = true;
       client.buffer = 100;
       client.shield = false;
@@ -145,7 +145,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
 
     } else if (chat.includes("/pistolshield")) {
       client.write("You are now equipped with a pistol and shield");
-      client.weaponDMG = pistolDMG;
+      client.weaponDMG = 2;
       client.pierce = false;
       client.shield = true;
       client.shielded = shielded;
@@ -155,7 +155,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
     } else if (chat.includes("/pistolpistol")) {
       client.write("You are now dual wielding pistols, what a badass")
       client.weapon = "dualPistols";
-      client.weaponDMG = dualPistolDMG;
+      client.weaponDMG = 4;
       client.pierce = false;
       client.shield = false;
       client.shielded = 0;
@@ -165,7 +165,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
     } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
       client.write("You are now equipped with a halo 1 pistol");
       client.weapon = "halo1_pistol";
-      client.weaponDMG = halo1pistol;
+      client.weaponDMG = 100;
       client.pierce = false;
       client.shielded = 0;
       client.buffer = 0;
@@ -237,7 +237,7 @@ You can also type /stats to see your current stats`);
                 socket.shielded = socket.shielded - client.weaponDMG
                 socketShotWrite(socket);
 
-              } else if ((socket.shield = socket.shield - client.weaponDMG) < 0) {
+              } else if ((socket.shielded = socket.shielded - client.weaponDMG) < 0) {
 
                 leftOverDamage = client.weaponDMG - socket.shield;
                 socket.shielded = 0;
@@ -284,9 +284,9 @@ You can also type /stats to see your current stats`);
 
               client.write(socket.name + " has died");
               socket.write("YOU DED");
+              socket.hp = 0;
 
             } else {
-
               socket.hp = socket.hp - client.weaponDMG;
               socketShotWrite(socket);
             }
@@ -349,8 +349,8 @@ You can also type /stats to see your current stats`);
               if (socket.cover === true && covers > 0) {
                 socket.cover = false;
                 covers = covers - 1;
-                socket.hp = socket.hp - grenadeDMG;
-                client.hp = client.hp - (grenadeDMG / 2);
+                socket.hp = socket.hp - 20;
+                client.hp = client.hp - (20 / 2);
                 client.grenades = client.grenades - 1;
 
                 socketGrenadeWrite(socket);
@@ -358,8 +358,8 @@ You can also type /stats to see your current stats`);
                 clientSomeGrenadeWrite(client);
 
               } else {
-                socket.hp = socket.hp - grenadeDMG;
-                client.hp = client.hp - grenadeDMG;
+                socket.hp = socket.hp - 20;
+                client.hp = client.hp - 20;
                 client.grenades = client.grenades - 1
 
                 socketGrenadeWrite(socket);
