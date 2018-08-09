@@ -20,6 +20,31 @@ let playersArr = [];
 let turn = true;
 let time = 2000;
 
+let clientStatsWrite = () => {
+  if (!client.name) {
+    client.write("NONAME");
+    client.write(`
+HP:` + client.hp);
+    client.write(`
+WeaponDmg:` + client.weaponDMG);
+    client.write(`
+Shields:` + client.shielded);
+    client.write(`
+Grenades:` + client.grenades);
+  } else {
+    client.write(`
+Name: ` + JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)));
+    client.write(`
+HP:` + client.hp);
+    client.write(`
+WeaponDmg:` + client.weaponDMG);
+    client.write(`
+Shields:` + client.shielded);
+    client.write(`
+Grenades:` + client.grenades);
+  }
+}
+
 let socketShotWrite = () => {
   socket.write(`
 You was shot at foo`);
@@ -173,16 +198,7 @@ You can also type /current to see player names online
 You can also type /stats to see your current stats`);
 
     } else if (chat.includes("/stats")) {
-      client.write(`
-        Name:` + client.name);
-      client.write(`
-        HP:` + client.hp);
-      client.write(`
-        WeaponDmg:` + client.weaponDMG);
-      client.write(`
-        Shields:` + client.shielded);
-      client.write(`
-        Grenades:` + client.grenades);
+      clientStatsWrite();
 
     } else if (chat.includes("/current")) {
       client.write(`
