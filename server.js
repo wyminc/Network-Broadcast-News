@@ -6,7 +6,7 @@ const maxHP = 100;
 const pistolDMG = 2;
 const rifleDMG = 3;
 const dualPistolDMG = 4;
-const grenadeDMG = 20;
+const grenadeDMG = 10;
 const halo1pistol = 100;
 
 let weapon = "no weapon";
@@ -128,7 +128,7 @@ Now choose a weapon, you only have 2 hands :)
 You will type "/" then the choice of gun you want
 WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
   Pistol: 2 damage, attribute: no pierce, able to be paired with another pistol or shield
-  Rifle: 2 damage, attribute: pierce, buff: extra 100hp, two hands
+  Rifle: 3 damage, attribute: pierce, buff: extra 100hp, two hands
   Shield: no damage, attribute: buff-canceler, buff: 100 shield
   Everyone comes equipped with a 3 grenades. They bypass cover but you take half the damage of the impact.
   Grenade: 10 damage, attribute: bypass cover.
@@ -141,7 +141,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.buffer = 100;
       client.shield = false;
       client.shielded = 0;
-      client.grenadeDMG = grenadeDMG
+      client.grenadeDMG = grenadeDMG;
       playersArr.push(client.name);
 
     } else if (chat.includes("/pistolshield")) {
@@ -151,7 +151,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shield = true;
       client.shielded = shielded;
       client.buffer = 0;
-      client.grenadeDMG = grenadeDMG
+      client.grenadeDMG = grenadeDMG;
       playersArr.push(client.name);
 
     } else if (chat.includes("/pistolpistol")) {
@@ -162,7 +162,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shield = false;
       client.shielded = 0;
       client.buffer = 0;
-      client.grenadeDMG = grenadeDMG
+      client.grenadeDMG = grenadeDMG;
       playersArr.push(client.name);
 
     } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
@@ -172,7 +172,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.pierce = false;
       client.shielded = 0;
       client.buffer = 0;
-      client.grenadeDMG = grenadeDMG
+      client.grenadeDMG = grenadeDMG;
       playersArr.push(client.name);
 
     } else if (chat.includes("/sniper")) {
@@ -183,7 +183,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shield = true;
       client.shielded = 0;
       client.buffer = 0;
-      client.grenadeDMG = grenadeDMG
+      client.grenadeDMG = grenadeDMG;
       playersArr.push(client.name);
 
     } else if (chat.includes("/help")) {
@@ -382,7 +382,7 @@ You can also type /stats to see your current stats`);
 
                   socketGrenadeWrite(socket);
 
-                  cient.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
+                  client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else {
                   socket.cover = false;
                   covers = covers - 1;
@@ -419,7 +419,7 @@ You can also type /stats to see your current stats`);
 
                   socketGrenadeWrite(socket);
 
-                  cient.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
+                  client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else {
                   socket.hp = socket.hp - client.grenadeDMG;
                   client.hp = client.hp - client.grenadeDMG;
