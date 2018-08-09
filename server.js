@@ -41,7 +41,7 @@ const server = net.createServer(client => {
   Grenades:` + client.grenades);
     } else {
       client.write(`
-  Name: ` + JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)));
+  Name:` + JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)));
       client.write(`
   HP:` + client.hp);
       client.write(`
@@ -203,7 +203,7 @@ You can also type /stats to see your current stats`);
 
     } else if (chat.includes("/current")) {
       client.write(`
-      Players currently online:` +
+Players currently online:` +
         `
       ` +
         playersArr);
