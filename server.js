@@ -138,6 +138,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.weaponDMG = rifleDMG;
       client.pierce = true;
       client.buffer = 100;
+      client.shield = false;
       client.shielded = 0;
       playersArr.push(client.name);
 
@@ -145,7 +146,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.write("You are now equipped with a pistol and shield");
       client.weaponDMG = pistolDMG;
       client.pierce = false;
-      client.shield = false;
+      client.shield = true;
       client.shielded = shielded;
       client.buffer = 0;
       playersArr.push(client.name);
@@ -155,6 +156,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.weapon = "dualPistols";
       client.weaponDMG = dualPistolDMG;
       client.pierce = false;
+      client.shield = false;
       client.shielded = 0;
       client.buffer = 0;
       playersArr.push(client.name);
@@ -325,37 +327,42 @@ You can also type /stats to see your current stats`);
 
       if (client.turn === true) {
         clientArr.forEach(socket => {
-          if (socket.name === attackedName) {
+          if (client.grenades > 0) {
+            if (socket.name === attackedName) {
 
-            turn = false;
-            var timer = setInterval(
-              function () {
-                turn = true;
-                clearInterval(timer);
-              }, time
-            )
+              turn = false;
+              var timer = setInterval(
+                function () {
+                  turn = true;
+                  clearInterval(timer);
+                }, time
+              )
 
-            if (socket.cover === true && socket.cover > 0) {
-              socket.cover = false;
-              covers = covers - 1;
-              socket.hp = socket.hp - grenadeDMG;
-              client.hp = client.hp - (grenadeDMG / 2);
-              client.grenades = client.grenades - 1;
+              if (socket.cover === true && covers > 0) {
+                socket.cover = false;
+                covers = covers - 1;
+                socket.hp = socket.hp - grenadeDMG;
+                client.hp = client.hp - (grenadeDMG / 2);
+                client.grenades = client.grenades - 1;
 
-              socketGrenadeWrite(socket);
+                socketGrenadeWrite(socket);
 
-              clientSomeGrenadeWrite(client);
+                clientSomeGrenadeWrite(client);
 
-            } else {
-              socket.hp = socket.hp - grenadeDMG;
-              client.hp = client.hp - grenadeDMG;
-              client.grenades = client.grenades - 1
+              } else {
+                socket.hp = socket.hp - grenadeDMG;
+                client.hp = client.hp - grenadeDMG;
+                client.grenades = client.grenades - 1
 
-              socketGrenadeWrite(socket);
+                socketGrenadeWrite(socket);
 
-              clientFullGrenadeWrite(client);
+                clientFullGrenadeWrite(client);
+              }
             }
+          } else {
+            client.write("YOU OUT OF GRENADES");
           }
+
         });
       } else {
 
