@@ -57,8 +57,6 @@ const server = net.createServer(client => {
     socket.write(`
   You was shot at foo`);
     socket.write(`
-  `)
-    socket.write(`
   HP:` + socket.hp);
     socket.write(`
   Shields:` + socket.shielded);
@@ -69,8 +67,6 @@ const server = net.createServer(client => {
   let socketGrenadeWrite = (socket) => {
     socket.write(`
   You was grenaded at foo`);
-    socket.write(`
-  `)
     socket.write(`
   HP:` + socket.hp);
     socket.write(`
@@ -85,8 +81,6 @@ const server = net.createServer(client => {
     client.write(`
   You received the full backlash from the grenade`);
     client.write(`
-  `)
-    client.write(`
   HP:` + client.hp);
     client.write(`
   Grenades:` + client.grenades);
@@ -99,8 +93,6 @@ const server = net.createServer(client => {
   let clientFullGrenadeWrite = (client) => {
     client.write(`
   You received the full backlash from the grenade`);
-    client.write(`
-  `)
     client.write(`
   HP:` + client.hp);
     client.write(`
