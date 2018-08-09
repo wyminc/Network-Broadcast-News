@@ -88,7 +88,7 @@ const server = net.createServer(client => {
   client.write(`
 Welcome to the sharpshooter arena.
 Please set up your username.
-To set up a username, type /name and then the username you want.
+To set up a username, type /name, space, and then the username you want.
 Please type /help if you need any help on commands.`);
 
 
