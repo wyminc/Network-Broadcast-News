@@ -8,6 +8,8 @@ const rifleDMG = 3;
 const dualPistolDMG = 4;
 const grenadeDMG = 10;
 const halo1pistol = 100;
+const shielded = 100;
+const time = 2000;
 
 let weapon = "no weapon";
 let shield = false;
@@ -15,10 +17,9 @@ let cover = false;
 let covers = 50;
 let grenades = 3;
 let leftOverDamage = 0;
-let shielded = 100;
 let playersArr = [];
 let turn = true;
-let time = 2000;
+
 
 
 
@@ -105,10 +106,11 @@ const server = net.createServer(client => {
 
   client.hp = maxHP;
   client.weapon = weapon;
-  client.shield = shield;
+  client.shield = false;
+  client.shielded = 0;
   client.cover = cover;
   client.grenades = grenades;
-  client.turn = turn;
+  client.turn = true;
 
   client.write(`
 Welcome to the sharpshooter arena.
