@@ -141,6 +141,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.buffer = 100;
       client.shield = false;
       client.shielded = 0;
+      client.grenadeDMG = grenadeDMG
       playersArr.push(client.name);
 
     } else if (chat.includes("/pistolshield")) {
@@ -150,6 +151,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shield = true;
       client.shielded = shielded;
       client.buffer = 0;
+      client.grenadeDMG = grenadeDMG
       playersArr.push(client.name);
 
     } else if (chat.includes("/pistolpistol")) {
@@ -160,6 +162,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shield = false;
       client.shielded = 0;
       client.buffer = 0;
+      client.grenadeDMG = grenadeDMG
       playersArr.push(client.name);
 
     } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
@@ -169,6 +172,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.pierce = false;
       client.shielded = 0;
       client.buffer = 0;
+      client.grenadeDMG = grenadeDMG
       playersArr.push(client.name);
 
     } else if (chat.includes("/sniper")) {
@@ -179,6 +183,7 @@ WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
       client.shield = true;
       client.shielded = 0;
       client.buffer = 0;
+      client.grenadeDMG = grenadeDMG
       playersArr.push(client.name);
 
     } else if (chat.includes("/help")) {
@@ -348,7 +353,7 @@ You can also type /stats to see your current stats`);
                 }, time
               )
               if (socket.cover === true && covers > 0) {
-                if (((socket.hp = socket.hp - grenadeDMG) < 0) && ((client.hp = client.hp - grenadeDMG) < 0)) {
+                if (((socket.hp = socket.hp - client.grenadeDMG) < 1) && ((client.hp = client.hp - client.grenadeDMG) < 1)) {
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp = 0;
@@ -358,20 +363,20 @@ You can also type /stats to see your current stats`);
                   socket.write("YOU DED");
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
-                } else if ((socket.hp = socket.hp - grenadeDMG) < 0) {
+                } else if ((socket.hp = socket.hp - client.grenadeDMG) < 1) {
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp = 0;
-                  client.hp = client.hp - (grenadeDMG / 2);
+                  client.hp = client.hp - (client.grenadeDMG / 2);
                   client.grenades = client.grenades - 1;
 
                   socketGrenadeWrite("YOU DED");
 
                   clientSomeGrenadeWrite(client);
-                } else if ((client.hp = client.hp - grenadeDMG) < 0) {
+                } else if ((client.hp = client.hp - client.grenadeDMG) < 1) {
                   socket.cover = false;
                   covers = covers - 1;
-                  socket.hp = socket.hp - grenadeDMG;
+                  socket.hp = socket.hp - client.grenadeDMG;
                   client.hp = 0;
                   client.grenades = client.grenades - 1;
 
@@ -381,8 +386,8 @@ You can also type /stats to see your current stats`);
                 } else {
                   socket.cover = false;
                   covers = covers - 1;
-                  socket.hp = socket.hp - grenadeDMG;
-                  client.hp = client.hp - (grenadeDMG / 2);
+                  socket.hp = socket.hp - client.grenadeDMG;
+                  client.hp = client.hp - (client.grenadeDMG / 2);
                   client.grenades = client.grenades - 1;
 
                   socketGrenadeWrite(socket);
@@ -391,7 +396,7 @@ You can also type /stats to see your current stats`);
                 }
 
               } else {
-                if (((socket.hp = socket.hp - grenadeDMG) < 0) && ((client.hp = client.hp - grenadeDMG) < 0)) {
+                if (((socket.hp = socket.hp - client.grenadeDMG) < 1) && ((client.hp = client.hp - client.grenadeDMG) < 1)) {
                   socket.hp = 0;
                   client.hp = 0;
                   client.grenades = client.grenades - 1;
@@ -399,16 +404,16 @@ You can also type /stats to see your current stats`);
                   socket.write("YOU DED");
 
                   client.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
-                } else if ((socket.hp = socket.hp - grenadeDMG) < 0) {
+                } else if ((socket.hp = socket.hp - client.grenadeDMG) < 1) {
                   socket.hp = 0;
-                  client.hp = client.hp - grenadeDMG;
+                  client.hp = client.hp - client.grenadeDMG;
                   client.grenades = client.grenades - 1;
 
                   socket.Write("YOU DED");
 
                   clientSomeGrenadeWrite(client);
-                } else if ((client.hp = client.hp - grenadeDMG) < 0) {
-                  socket.hp = socket.hp - grenadeDMG;
+                } else if ((client.hp = client.hp - client.grenadeDMG) < 1) {
+                  socket.hp = socket.hp - client.grenadeDMG;
                   client.hp = 0;
                   client.grenades = client.grenades - 1;
 
@@ -416,8 +421,8 @@ You can also type /stats to see your current stats`);
 
                   cient.write("YOU KILLED YOURSELF WITH A GRENADE LOL");
                 } else {
-                  socket.hp = socket.hp - grenadeDMG;
-                  client.hp = client.hp - grenadeDMG;
+                  socket.hp = socket.hp - client.grenadeDMG;
+                  client.hp = client.hp - client.grenadeDMG;
                   client.grenades = client.grenades - 1
 
                   socketGrenadeWrite(socket);
