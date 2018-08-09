@@ -106,10 +106,11 @@ Please type /help if you need any help on commands.`);
       client.name = (chat.split(" "))[1];
       client.write(`
 Now choose a weapon, you only have 2 hands :)
+You will type "/" then the choice of gun you want
+WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
   Pistol: 2 damage, attribute: no pierce, able to be paired with another pistol or shield
   Rifle: 2 damage, attribute: pierce, buff: extra 100hp, two hands
   Shield: no damage, attribute: buff-canceler, buff: 100 shield
-  WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
   Everyone comes equipped with a 3 grenades. They bypass cover but you take half the damage of the impact.
   Grenade: 10 damage, attribute: bypass cover.
       `)
