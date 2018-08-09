@@ -348,7 +348,7 @@ You can also type /stats to see your current stats`);
                 }, time
               )
               if (socket.cover === true && covers > 0) {
-                if ((socket.hp = socket.hp - grenadeDMG) < 0 && (client.hp = client.hp - grenadeDMG) < 0) {
+                if (((socket.hp = socket.hp - grenadeDMG) < 0) && ((client.hp = client.hp - grenadeDMG) < 0)) {
                   socket.cover = false;
                   covers = covers - 1;
                   socket.hp = 0;
@@ -391,7 +391,7 @@ You can also type /stats to see your current stats`);
                 }
 
               } else {
-                if ((socket.hp = socket.hp - grenadeDMG) < 0 && (client.hp = client.hp - grenadeDMG) < 0) {
+                if (((socket.hp = socket.hp - grenadeDMG) < 0) && ((client.hp = client.hp - grenadeDMG) < 0)) {
                   socket.hp = 0;
                   client.hp = 0;
                   client.grenades = client.grenades - 1;
