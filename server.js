@@ -238,13 +238,13 @@ You can also type /stats to see your current stats`);
               socket.cover = false;
               covers = covers - 1;
               client.write(socket.name + " was under cover");
-            } else if (socket.shield === true && client.weapon !== "rifle" && socket.shielded > 0) {
+            } else if (socket.shield === true && client.weapon !== "rifle" && socket.shielded >= 0) {
               if ((socket.shielded = socket.shielded - client.weaponDMG) > 0) {
 
                 socket.shielded = (socket.shielded - client.weaponDMG);
                 socketShotWrite(socket);
 
-              } else if ((socket.shielded = socket.shielded - client.weaponDMG) < 0) {
+              } else if ((socket.shielded = socket.shielded - client.weaponDMG) < 1) {
 
                 leftOverDamage = (client.weaponDMG - socket.shield);
                 socket.shielded = 0;
@@ -275,7 +275,7 @@ You can also type /stats to see your current stats`);
                 socket.buffer = (socket.buffer - client.weaponDMG);
                 socketShotWrite(socket);
 
-              } else if ((socket.buffer = socket.buffer - client.weaponDMG) < 0) {
+              } else if ((socket.buffer = socket.buffer - client.weaponDMG) < 1) {
 
                 leftOverDamage = (client.weaponDMG - socket.buffer);
                 socket.buffer = 0;
