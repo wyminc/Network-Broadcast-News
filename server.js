@@ -27,7 +27,7 @@ let time = 2000;
 const server = net.createServer(client => {
   console.log("CLIENT CONNECTED!");
 
-  let clientStatsWrite = () => {
+  let clientStatsWrite = (client) => {
     if (!client.name) {
       client.write(`
   NONAME`);
@@ -53,7 +53,7 @@ const server = net.createServer(client => {
     }
   }
 
-  let socketShotWrite = () => {
+  let socketShotWrite = (socket) => {
     socket.write(`
   You was shot at foo`);
     socket.write(`
@@ -66,25 +66,25 @@ const server = net.createServer(client => {
   HP Buffer:` + socket.buffer);
   };
 
-  let socketGrenadeWrite = () => {
+  let socketGrenadeWrite = (socket) => {
     socket.write(`
   You was grenaded at foo`);
     socket.write(`
   `)
     socket.write(`
   HP:` + socket.hp);
-    client.write(`
-  Grenades:` + client.grenades);
     socket.write(`
   Shields:` + socket.shielded);
     socket.write(`
   HP Buffer:` + socket.buffer);
   };
 
-  let clientSomeGrenadeWrite = () => {
+  // };
+
+  let clientSomeGrenadeWrite = (client) => {
     client.write(`
   You received the full backlash from the grenade`);
-    socket.write(`
+    client.write(`
   `)
     client.write(`
   HP:` + client.hp);
@@ -96,10 +96,10 @@ const server = net.createServer(client => {
   HP Buffer:` + client.buffer);
   }
 
-  let clientFullGrenadeWrite = () => {
+  let clientFullGrenadeWrite = (client) => {
     client.write(`
   You received the full backlash from the grenade`);
-    socket.write(`
+    client.write(`
   `)
     client.write(`
   HP:` + client.hp);
@@ -199,7 +199,7 @@ You can also type /current to see player names online
 You can also type /stats to see your current stats`);
 
     } else if (chat.includes("/stats")) {
-      clientStatsWrite();
+      clientStatsWrite(client);
 
     } else if (chat.includes("/current")) {
       client.write(`
@@ -239,7 +239,7 @@ You can also type /stats to see your current stats`);
               if ((socket.shielded = socket.shielded - client.weaponDMG) > 0) {
 
                 socket.shielded = socket.shielded - client.weaponDMG
-                socketShotWrite();
+                socketShotWrite(socket);
 
               } else if ((socket.shield = socket.shield - client.weaponDMG) < 0) {
 
@@ -247,42 +247,42 @@ You can also type /stats to see your current stats`);
                 socket.shielded = 0;
                 socket.shield = false;
                 socket.hp = socket.hp - leftOverDamage;
-                socketShotWrite();
+                socketShotWrite(socket);
 
               } else if ((socket.shielded = socket.shielded - client.weaponDMG) === 0) {
 
                 socket.shielded = 0;
                 socket.shield = false;
-                socketShotWrite();
+                socketShotWrite(socket);
               }
             } else if (socket.shield === true && client.weapon === "rifle" && socket.shielded > 0) {
 
               socket.hp = socket.hp - client.weaponDMG;
-              socketShotWrite();
+              socketShotWrite(socket);
 
             } else if (socket.weapon === "rifle" && client.shield === true) {
 
               socket.hp = socket.hp - client.weaponDMG;
-              socketShotWrite();
+              socketShotWrite(socket);
 
             } else if (socket.weapon === "rifle" && client.shield === false) {
 
               if ((socket.buffer = socket.buffer - client.weaponDMG) > 0) {
 
                 socket.buffer = socket.buffer - client.weaponDMG
-                socketShotWrite();
+                socketShotWrite(socket);
 
               } else if ((socket.buffer = socket.buffer - client.weaponDMG) < 0) {
 
                 leftOverDamage = client.weaponDMG - socket.buffer;
                 socket.buffer = 0;
                 socket.hp = socket.hp - leftOverDamage;
-                socketShotWrite();
+                socketShotWrite(socket);
 
               } else if ((socket.buffer = socket.shielded - client.weaponDMG) === 0) {
 
                 socket.buffer = 0;
-                socketShotWrite();
+                socketShotWrite(socket);
               }
             } else if ((socket.hp = socket.hp - client.weaponDMG) < 1) {
 
@@ -292,7 +292,7 @@ You can also type /stats to see your current stats`);
             } else {
 
               socket.hp = socket.hp - client.weaponDMG;
-              socketShotWrite();
+              socketShotWrite(socket);
             }
           }
         })
@@ -323,7 +323,9 @@ You can also type /stats to see your current stats`);
           }
         });
       } else {
+
         client.write("CAN'T BE SPAMMING");
+
       }
     } else if (chat.includes("/grenade")) {
       const splitAttackChat = (chat.split(" "))[1];
@@ -348,23 +350,25 @@ You can also type /stats to see your current stats`);
               client.hp = client.hp - (grenadeDMG / 2);
               client.grenades = client.grenades - 1;
 
-              socketGrenadeWrite();
+              socketGrenadeWrite(socket);
 
-              clientSomeGrenadeWrite();
+              clientSomeGrenadeWrite(client);
 
             } else {
               socket.hp = socket.hp - grenadeDMG;
               client.hp = client.hp - grenadeDMG;
               client.grenades = client.grenades - 1
 
-              socketGrenadeWrite();
+              socketGrenadeWrite(socket);
 
-              clientFullGrenadeWrite();
+              clientFullGrenadeWrite(client);
             }
           }
         });
       } else {
+
         client.write("CAN'T BE SPAMMING");
+
       }
     } else {
       clientArr.forEach(socket => {
