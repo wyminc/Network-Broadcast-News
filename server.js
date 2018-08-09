@@ -203,7 +203,7 @@ You can also type /stats to see your current stats`);
 
     } else if (chat.includes("/current")) {
       client.write(`
-Players currently online:` +
+  Players currently online:` +
         `
       ` +
         playersArr);
