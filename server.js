@@ -20,17 +20,63 @@ let playersArr = [];
 let turn = true;
 let time = 2000;
 
-// let socketShotWrite = 
+let socketShotWrite = () => {
+  socket.write(`
+You was shot at foo`);
+  socket.write(`
+`)
+  socket.write(`
+HP:` + socket.hp);
+  socket.write(`
+Shields:` + socket.shielded);
+  socket.write(`
+HP Buffer:` + socket.buffer);
+};
 
-// // You was shot at foo`);
-// // socket.write(`
-// // `)
-// // socket.write(`
-// // HP:` + socket.hp);
-// // socket.write(`
-// // Shields:` + socket.shielded);
-// // socket.write(`
-// // HP Buffer:` + socket.buffer);
+let socketGrenadeWrite = () => {
+  socket.write(`
+You was grenaded at foo`);
+  socket.write(`
+`)
+  socket.write(`
+HP:` + socket.hp);
+  client.write(`
+Grenades:` + client.grenades);
+  socket.write(`
+Shields:` + socket.shielded);
+  socket.write(`
+HP Buffer:` + socket.buffer);
+};
+
+let clientSomeGrenadeWrite = () => {
+  client.write(`
+You received the full backlash from the grenade`);
+  socket.write(`
+`)
+  client.write(`
+HP:` + client.hp);
+  client.write(`
+Grenades:` + client.grenades);
+  client.write(`
+Shields:` + client.shielded);
+  client.write(`
+HP Buffer:` + client.buffer);
+}
+
+let clientFullGrenadeWrite = () => {
+  client.write(`
+You received the full backlash from the grenade`);
+  socket.write(`
+`)
+  client.write(`
+HP:` + client.hp);
+  client.write(`
+Grenades:` + client.grenades);
+  client.write(`
+Shields:` + client.shielded);
+  client.write(`
+HP Buffer:` + client.buffer);
+}
 
 
 
@@ -58,7 +104,6 @@ Please type /help if you need any help on commands.`);
 
     if (chat.includes("/name")) {
       client.name = (chat.split(" "))[1];
-      playersArr.push(client.name);
       client.write(`
 Now choose a weapon, you only have 2 hands :)
   Pistol: 2 damage, attribute: no pierce, able to be paired with another pistol or shield
@@ -75,6 +120,7 @@ Now choose a weapon, you only have 2 hands :)
       client.pierce = true;
       client.buffer = 100;
       client.shielded = 0;
+      playersArr.push(client.name);
 
     } else if (chat.includes("/pistolshield")) {
       client.write("You are now equipped with a pistol and shield");
@@ -83,6 +129,7 @@ Now choose a weapon, you only have 2 hands :)
       client.shield = false;
       client.shielded = shielded;
       client.buffer = 0;
+      playersArr.push(client.name);
 
     } else if (chat.includes("/pistolpistol")) {
       client.write("You are now dual wielding pistols, what a badass")
@@ -91,6 +138,7 @@ Now choose a weapon, you only have 2 hands :)
       client.pierce = false;
       client.shielded = 0;
       client.buffer = 0;
+      playersArr.push(client.name);
 
     } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
       client.write("You are now equipped with a halo 1 pistol");
@@ -99,6 +147,7 @@ Now choose a weapon, you only have 2 hands :)
       client.pierce = false;
       client.shielded = 0;
       client.buffer = 0;
+      playersArr.push(client.name);
 
     } else if (chat.includes("/sniper")) {
       client.write("You are now equipped with a sniper rifle, use /headshot instead of /shoot to one shot people");
@@ -108,6 +157,7 @@ Now choose a weapon, you only have 2 hands :)
       client.shield = true;
       client.shielded = 0;
       client.buffer = 0;
+      playersArr.push(client.name);
 
     } else if (chat.includes("/help")) {
       client.write(`
@@ -169,147 +219,69 @@ You can also type /stats to see your current stats`);
               client.write(socket.name + " was under cover");
             } else if (socket.shield === true && client.weapon !== "rifle" && socket.shielded > 0) {
               if ((socket.shielded = socket.shielded - client.weaponDMG) > 0) {
-                socket.shielded = socket.shielded - client.weaponDMG
 
-                socket.write(`
-You was shot at foo`);
-                socket.write(`
-                `)
-                socket.write(`
-HP:` + socket.hp);
-                socket.write(`
-Shields:` + socket.shielded);
-                socket.write(`
-HP Buffer:` + socket.buffer);
+                socket.shielded = socket.shielded - client.weaponDMG
+                socketShotWrite();
 
               } else if ((socket.shield = socket.shield - client.weaponDMG) < 0) {
+
                 leftOverDamage = client.weaponDMG - socket.shield;
                 socket.shielded = 0;
                 socket.shield = false;
                 socket.hp = socket.hp - leftOverDamage;
-
-                socket.write(`
-You was shot at foo`);
-                socket.write(`
-                `)
-                socket.write(`
-HP:` + socket.hp);
-                socket.write(`
-Shields:` + socket.shielded);
-                socket.write(`
-HP Buffer:` + socket.buffer);
+                socketShotWrite();
 
               } else if ((socket.shielded = socket.shielded - client.weaponDMG) === 0) {
+
                 socket.shielded = 0;
                 socket.shield = false;
-
-                socket.write(`
-You was shot at foo`);
-                socket.write(`
-                `)
-                socket.write(`
-HP:` + socket.hp);
-                socket.write(`
-Shields:` + socket.shielded);
-                socket.write(`
-HP Buffer:` + socket.buffer);
+                socketShotWrite();
               }
             } else if (socket.shield === true && client.weapon === "rifle" && socket.shielded > 0) {
-              socket.hp = socket.hp - client.weaponDMG;
 
-              socket.write(`
-You was shot at foo`);
-              socket.write(`
-                `)
-              socket.write(`
-HP:` + socket.hp);
-              socket.write(`
-Shields:` + socket.shielded);
-              socket.write(`
-HP Buffer:` + socket.buffer);
+              socket.hp = socket.hp - client.weaponDMG;
+              socketShotWrite();
 
             } else if (socket.weapon === "rifle" && client.shield === true) {
-              socket.hp = socket.hp - client.weaponDMG;
 
-              socket.write(`
-You was shot at foo`);
-              socket.write(`
-                `)
-              socket.write(`
-HP:` + socket.hp);
-              socket.write(`
-Shields:` + socket.shielded);
-              socket.write(`
-HP Buffer:` + socket.buffer);
+              socket.hp = socket.hp - client.weaponDMG;
+              socketShotWrite();
 
             } else if (socket.weapon === "rifle" && client.shield === false) {
-              if ((socket.buffer = socket.buffer - client.weaponDMG) > 0) {
-                socket.buffer = socket.buffer - client.weaponDMG
 
-                socket.write(`
-You was shot at foo`);
-                socket.write(`
-                `)
-                socket.write(`
-HP:` + socket.hp);
-                socket.write(`
-Shields:` + socket.shielded);
-                socket.write(`
-HP Buffer:` + socket.buffer);
+              if ((socket.buffer = socket.buffer - client.weaponDMG) > 0) {
+
+                socket.buffer = socket.buffer - client.weaponDMG
+                socketShotWrite();
 
               } else if ((socket.buffer = socket.buffer - client.weaponDMG) < 0) {
+
                 leftOverDamage = client.weaponDMG - socket.buffer;
                 socket.buffer = 0;
                 socket.hp = socket.hp - leftOverDamage;
-
-                socket.write(`
-You was shot at foo`);
-                socket.write(`
-                `)
-                socket.write(`
-HP:` + socket.hp);
-                socket.write(`
-Shields:` + socket.shielded);
-                socket.write(`
-HP Buffer:` + socket.buffer);
+                socketShotWrite();
 
               } else if ((socket.buffer = socket.shielded - client.weaponDMG) === 0) {
+
                 socket.buffer = 0;
-
-                socket.write(`
-You was shot at foo`);
-                socket.write(`
-                `)
-                socket.write(`
-HP:` + socket.hp);
-                socket.write(`
-Shields:` + socket.shielded);
-                socket.write(`
-HP Buffer:` + socket.buffer);
-
+                socketShotWrite();
               }
             } else if ((socket.hp = socket.hp - client.weaponDMG) < 1) {
+
               client.write(socket.name + " has died");
               socket.write("YOU DED");
-            } else {
-              socket.hp = socket.hp - client.weaponDMG;
 
-              socket.write(`
-You was shot at foo`);
-              socket.write(`
-                `)
-              socket.write(`
-HP:` + socket.hp);
-              socket.write(`
-Shields:` + socket.shielded);
-              socket.write(`
-HP Buffer:` + socket.buffer);
+            } else {
+
+              socket.hp = socket.hp - client.weaponDMG;
+              socketShotWrite();
             }
           }
-
         })
       } else {
+
         client.write("CAN'T BE SPAMMING");
+
       }
     } else if (chat.includes("/headshot")) {
       const splitAttackChat = (chat.split(" "))[1]
@@ -358,50 +330,18 @@ HP Buffer:` + socket.buffer);
               client.hp = client.hp - (grenadeDMG / 2);
               client.grenades = client.grenades - 1;
 
-              socket.write(`
-              You was grenaded at foo`);
-              socket.write(`
-              HP:` + socket.hp);
-              socket.write(`
-              Shields:` + socket.shielded);
-              socket.write(`
-              HP Buffer:` + socket.buffer);
+              socketGrenadeWrite();
 
-              client.write(`
-              You received some backlash from the grenade`);
-              client.write(`
-              HP:` + client.hp);
-              client.write(`
-              Shields:` + client.shielded);
-              client.write(`
-              Grenades:` + client.grenades);
-              client.write(`
-              HP Buffer:` + client.buffer);
+              clientSomeGrenadeWrite();
 
             } else {
               socket.hp = socket.hp - grenadeDMG;
               client.hp = client.hp - grenadeDMG;
               client.grenades = client.grenades - 1
 
-              socket.write(`
-              You was grenaded at foo`);
-              socket.write(`
-              HP:` + socket.hp);
-              socket.write(`
-              Shields:` + socket.shielded);
-              socket.write(`
-              HP Buffer:` + socket.buffer);
+              socketGrenadeWrite();
 
-              client.write(`
-              You received the full backlash from the grenade`);
-              client.write(`
-              HP:` + client.hp);
-              client.write(`
-              Shields:` + client.shielded);
-              client.write(`
-              Grenades:` + client.grenades);
-              client.write(`
-              HP Buffer:` + client.buffer);
+              clientFullGrenadeWrite();
             }
           }
         });
