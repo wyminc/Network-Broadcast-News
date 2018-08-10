@@ -9,7 +9,7 @@ const dualPistolDMG = 4;
 const grenadeDMG = 10;
 const halo1pistol = 100;
 const shielded = 100;
-const time = 2000;
+const time = 3000;
 
 let cover = false;
 let covers = 100;
@@ -125,12 +125,13 @@ const server = net.createServer(client => {
 
     socket.hp = maxHP;
     socket.name = undefined;
-    socket.weapon = false;
+    socket.weapon = "noWeapon";
     socket.shield = false;
     socket.cover = cover;
     socket.grenades = grenades;
     socket.turn = false;
     socket.counter = 0;
+    socket.hasWeapon = false;
 
     socket.write("Respawn timer of 5 seconds before you can create a new character again");
     var timer = setInterval(function () {
@@ -147,7 +148,8 @@ Please type /help if you need any help on commands.`)
 
 
   client.hp = maxHP;
-  client.weapon = false;
+  client.weapon = "noWeapon";
+  client.hasWeapon = false;
   client.shield = false;
   client.cover = cover;
   client.grenades = grenades;
@@ -231,6 +233,7 @@ Everyone comes equipped with a 3 grenades. They bypass cover but you take half t
       } else if (chat.includes("/rifle")) {
         client.write("You are now equipped with a rifle, you aint dual equipped");
         client.weapon = "rifle";
+        client.hasWeapon = true;
         client.weaponDMG = rifleDMG;
         client.pierce = true;
         client.buffer = 100;
@@ -240,6 +243,7 @@ Everyone comes equipped with a 3 grenades. They bypass cover but you take half t
       } else if (chat.includes("/pistolshield")) {
         client.write("You are now equipped with a pistol and shield");
         client.weapon = "pistolShield";
+        client.hasWeapon = true;
         client.weaponDMG = pistolDMG;
         client.pierce = false;
         client.shield = true;
@@ -249,6 +253,7 @@ Everyone comes equipped with a 3 grenades. They bypass cover but you take half t
       } else if (chat.includes("/pistolpistol")) {
         client.write("You are now dual wielding pistols, what a badass")
         client.weapon = "dualPistols";
+        client.hasWeapon = true;
         client.weaponDMG = dualPistolDMG;
         client.pierce = false;
         client.shield = false;
@@ -258,6 +263,7 @@ Everyone comes equipped with a 3 grenades. They bypass cover but you take half t
       } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
         client.write("You are now equipped with a halo 1 pistol");
         client.weapon = "halo1pistol";
+        client.hasWeapon = true;
         client.weaponDMG = halo1pistol;
         client.pierce = false;
         client.shielded = 0;
@@ -266,6 +272,7 @@ Everyone comes equipped with a 3 grenades. They bypass cover but you take half t
       } else if (chat.includes("/sniper")) {
         client.write("You are now equipped with a sniper rifle, use /headshot instead of /shoot to one shot people");
         client.weapon = "sniper";
+        client.hasWeapon = true;
         client.weaponDMG = 500;
         client.pierce = true;
         client.shield = true;
@@ -329,7 +336,7 @@ You can also type /stats to see your current stats`);
 
         if (client.turn === true) {
           clientArr.forEach(socket => {
-            if (socket.weapon === false) {
+            if (socket.hasWeapon === false) {
               client.write("Let the player choose a weapon first before you shoot");
             } else {
               if (socket.name === attackedName) {
