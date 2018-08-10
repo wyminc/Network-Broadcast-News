@@ -12,15 +12,10 @@ const shielded = 100;
 const time = 2000;
 
 let cover = false;
-let covers = 50;
+let covers = 100;
 let grenades = 3;
 let leftOverDamage = 0;
 let namesArr = [];
-
-
-
-
-
 
 
 const server = net.createServer(client => {
@@ -38,6 +33,21 @@ const server = net.createServer(client => {
   Shields:` + client.shielded);
       client.write(`
   Grenades:` + client.grenades);
+    } else if (client.weapon === "notRifle" || client.weapon === "rifle") {
+      client.write(`
+  Name:` + JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)));
+      client.write(`
+  HP:` + client.hp);
+      client.write(`
+  WeaponDmg:2`);
+      client.write(`
+  Crit:true`);
+      client.write(`
+  Shields:` + client.shielded);
+      client.write(`
+  HP Buffer:` + client.buffer);
+      client.write(`
+  Grenades:` + client.grenades);
     } else {
       client.write(`
   Name:` + JSON.stringify(client.name).slice(1, (JSON.stringify(client.name).length - 3)));
@@ -45,6 +55,8 @@ const server = net.createServer(client => {
   HP:` + client.hp);
       client.write(`
   WeaponDmg:` + client.weaponDMG);
+      client.write(`
+  Crit:false`);
       client.write(`
   Shields:` + client.shielded);
       client.write(`
@@ -64,7 +76,7 @@ const server = net.createServer(client => {
     socket.write(`
   HP Buffer:` + socket.buffer);
 
-    client.write("You shot " + JSON.stringify(client.name).slice(1, (JSON.stringify(socket.name).length - 3)) + " for " + client.weaponDMG + " damage");
+    client.write("You shot " + JSON.stringify(socket.name).slice(1, (JSON.stringify(socket.name).length - 3)) + " for " + client.weaponDMG + " damage");
   };
 
 
@@ -107,6 +119,7 @@ const server = net.createServer(client => {
   HP Buffer:` + client.buffer);
   }
 
+
   client.hp = maxHP;
   client.weapon = "noWeapon";
   client.shield = false;
@@ -115,6 +128,16 @@ const server = net.createServer(client => {
   client.turn = true;
 
   client.write(`
+            .-._
+           ///  |
+          ///L_/_)
+         ///// |||
+        /FUQ)/| ||
+       / /""  |_/
+      / /
+     / /
+    (U)
+
 Welcome to the sharpshooter arena.
 Please set up your username.
 To set up a username, type /name and the username you want.
@@ -159,9 +182,20 @@ Please try another name by typing /name and your desired name again`)
 Now choose a weapon, you only have 2 hands :)
 You will type "/" then the choice of gun you want
 WARNING: IF YOU WANT TO DUAL WIELD, WRITE /pistolpistol OR /pistolshield.
-  Pistol: 2 damage, attribute: no pierce, able to be paired with another pistol or shield
-  Rifle: 3 damage, attribute: pierce, buff: extra 100hp, two hands
-  Shield: no damage, attribute: buff-canceler, buff: 100 shield
+WEAPONS:
+  Pistol: 
+    2 damage, no critical hits 
+    attribute: not able to pierce shield
+    one-hand, able to be paired with another pistol or shield
+  Rifle: 
+    2 damage, critical hit for double damage
+    attribute: pierce shield on critical 
+    buff: extra 100hp
+    two hands
+  Shield:
+    no damage, but can be paired with pistol
+    attribute: cancels rifle's extra hp buff 
+    shield: 100 shield absorbption
 Everyone comes equipped with a 3 grenades. They bypass cover but you take half the damage of the impact.
   Grenade: 10 damage, attribute: bypass cover.`)
         }
@@ -177,6 +211,7 @@ Everyone comes equipped with a 3 grenades. They bypass cover but you take half t
       client.grenadeDMG = grenadeDMG;
     } else if (chat.includes("/pistolshield")) {
       client.write("You are now equipped with a pistol and shield");
+      client.weapon = "pistolShield";
       client.weaponDMG = pistolDMG;
       client.pierce = false;
       client.shield = true;
@@ -244,6 +279,23 @@ You can also type /stats to see your current stats`);
 
 
     } else if (chat.includes("/shoot")) {
+
+      let rifleCrit = (client) => {
+        let pierceArr = [false, false, true];
+        let dmgArr = [2, 2, 4];
+        let weaponArr = ["notRifle", "notRifle", "rifle"]
+
+        let randomNum = Math.floor(Math.random() * (pierceArr.length));
+
+        let randomPierceArr = pierceArr[randomNum];
+        let randomDmgArr = dmgArr[randomNum];
+        let randomWeapon = weaponArr[randomNum];
+
+        client.weapon = randomWeapon;
+        client.pierce = randomPierceArr;
+        client.weaponDMG = randomDmgArr;
+      }
+
       const splitAttackChat = (chat.split(" "))[1];
       const attackedName = splitAttackChat;
 
@@ -259,6 +311,7 @@ You can also type /stats to see your current stats`);
                 clearInterval(timer);
               }, time)
               client.cover = false;
+              rifleCrit(client);
               if (socket.cover === true) {
                 socket.cover = false;
                 covers = covers - 1;
