@@ -121,7 +121,7 @@ const server = net.createServer(client => {
 
 
   client.hp = maxHP;
-  client.weapon = "noWeapon";
+  client.weapon = false;
   client.shield = false;
   client.cover = cover;
   client.grenades = grenades;
@@ -229,7 +229,7 @@ Everyone comes equipped with a 3 grenades. They bypass cover but you take half t
       client.grenadeDMG = grenadeDMG;
     } else if (chat.includes("/onlypistol") || chat.includes("/halo1pistol") || chat.includes("/justpistol")) {
       client.write("You are now equipped with a halo 1 pistol");
-      client.weapon = "halo1_pistol";
+      client.weapon = "halo1pistol";
       client.weaponDMG = halo1pistol;
       client.pierce = false;
       client.shielded = 0;
@@ -301,7 +301,7 @@ You can also type /stats to see your current stats`);
 
       if (client.turn === true) {
         clientArr.forEach(socket => {
-          if (socket.weapon === "noWeapon") {
+          if (socket.weapon === false) {
             client.write("Let the player choose a weapon first before you shoot");
           } else {
             if (socket.name === attackedName) {
@@ -315,7 +315,8 @@ You can also type /stats to see your current stats`);
               if (socket.cover === true) {
                 socket.cover = false;
                 covers = covers - 1;
-                client.write(socket.name + " was under cover");
+                client.write(JSON.stringify(socket.name).slice(1, (JSON.stringify(socket.name).length - 3)) + " was under cover");
+                socket.write("You are no longer under cover");
               } else if (socket.shield === true && client.weapon !== "rifle") {
 
                 if ((socket.shielded - client.weaponDMG) > socket.shielded) {
